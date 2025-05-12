@@ -343,9 +343,11 @@ bool ReadHeader(FILE *f, XPKFILEHEADER *header)
 {
 	if (f == NULL || fread(header, sizeof (XPKFILEHEADER), 1, f) != 1)
 		return false;
-
+	
+	#if SDL_BYTEORDER == SDL_LIL_ENDIAN
 	header->SrcLen = SWAP32(header->SrcLen);
 	header->DstLen = SWAP32(header->DstLen);
+	#endif
 	
 	return true;
 }

@@ -32,14 +32,18 @@ static void removeSampleFileExt(char *text) // for sample saver
 static void iffWriteChunkHeader(FILE *f, char *chunkName, uint32_t chunkLen)
 {
 	fwrite(chunkName, sizeof (int32_t), 1, f);
+	#if SDL_BYTEORDER == SDL_LIL_ENDIAN
 	chunkLen = SWAP32(chunkLen);
+	#endif
 	fwrite(&chunkLen, sizeof (int32_t), 1, f);
 }
 
 
 static void iffWriteUint32(FILE *f, uint32_t value)
 {
+	#if SDL_BYTEORDER == SDL_LIL_ENDIAN
 	value = SWAP32(value);
+	#endif
 	fwrite(&value, sizeof (int32_t), 1, f);
 }
 
