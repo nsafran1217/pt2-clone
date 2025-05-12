@@ -73,11 +73,21 @@ int main(int argc, char *argv[])
 	fseek(in, 0x12, SEEK_SET);
 	fread(&bitmap_width, 4, 1, in);
 	fread(&bitmap_height, 4, 1, in);
+	#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	SWAP32(bitmap_width);
+	SWAP32(bitmap_height);
+	#endif
 	fseek(in, 0x1C, SEEK_SET);
 	fread(&bitmap_depth, 4, 1, in);
+	#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	SWAP32(bitmap_depth);
+	#endif
 	bitmap_depth &= 0xFF;
 	fseek(in, 0x0A, SEEK_SET);
 	fread(&bitmap_offset, 4, 1, in);
+	#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	SWAP32(bitmap_offset);
+	#endif
 	fseek(in, bitmap_offset, SEEK_SET);
 
 	if (bitmap_depth != 16 && bitmap_depth != 24 && bitmap_depth != 32)

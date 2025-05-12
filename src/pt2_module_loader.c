@@ -54,6 +54,9 @@ module_t *modLoad(UNICHAR *fileName)
 
 	// check if mod is a powerpacker mod
 	fread(&powerPackerID, 4, 1, f);
+	#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	powerPackerID = SWAP32(powerPackerID);
+	#endif
 	if (powerPackerID == 0x30325850) // "PX20"
 	{
 		displayErrorMsg("ENCRYPTED MOD !");

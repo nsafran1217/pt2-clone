@@ -42,6 +42,10 @@ bool loadWAVSample(FILE *f, uint32_t filesize, moduleSample_t *s)
 
 		fread(&chunkID, 4, 1, f); if (feof(f)) break;
 		fread(&chunkSize, 4, 1, f); if (feof(f)) break;
+		#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+		chunkID = SWAP32(chunkID);
+		chunkSize = SWAP32(chunkSize);
+		#endif
 
 		uint32_t endOfChunk = (ftell(f) + chunkSize) + (chunkSize & 1);
 		switch (chunkID)
@@ -65,6 +69,9 @@ bool loadWAVSample(FILE *f, uint32_t filesize, moduleSample_t *s)
 				if (chunkSize >= 4)
 				{
 					fread(&chunkID, 4, 1, f);
+					#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+					chunkID = SWAP32(chunkID);
+					#endif
 					if (chunkID == 0x4F464E49) // "INFO"
 					{
 						bytesRead = 0;
@@ -72,6 +79,10 @@ bool loadWAVSample(FILE *f, uint32_t filesize, moduleSample_t *s)
 						{
 							fread(&chunkID, 4, 1, f);
 							fread(&chunkSize, 4, 1, f);
+							#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+							chunkID = SWAP32(chunkID);
+							chunkSize = SWAP32(chunkSize);
+							#endif
 
 							switch (chunkID)
 							{
@@ -127,6 +138,12 @@ bool loadWAVSample(FILE *f, uint32_t filesize, moduleSample_t *s)
 	fread(&sampleRate,  4, 1, f);
 	fseek(f, 6, SEEK_CUR);
 	fread(&bitsPerSample, 2, 1, f);
+	#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	audioFormat = SWAP16(audioFormat);
+	numChannels = SWAP16(numChannels);
+	sampleRate  = SWAP32(sampleRate);
+	bitsPerSample = SWAP16(bitsPerSample);
+	#endif
 	int32_t sampleLength = dataLen;
 	// ---------------------------
 
@@ -241,6 +258,11 @@ bool loadWAVSample(FILE *f, uint32_t filesize, moduleSample_t *s)
 			return false;
 		}
 
+		#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+		for (int i = 0; i < sampleLength; i++)
+			audioDataS16[i] = SWAP16(audioDataS16[i]);
+		#endif
+
 		// convert from stereo to mono (if needed)
 		if (numChannels == 2)
 		{
@@ -300,6 +322,7 @@ bool loadWAVSample(FILE *f, uint32_t filesize, moduleSample_t *s)
 		{
 			audioDataU8[0] = 0;
 			fread(&audioDataU8[1], 3, 1, f);
+			// Might need to swap bytes here
 			audioDataU8 += sizeof (int32_t);
 		}
 
@@ -366,6 +389,10 @@ bool loadWAVSample(FILE *f, uint32_t filesize, moduleSample_t *s)
 			displayErrorMsg("I/O ERROR !");
 			return false;
 		}
+		#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+		for (int i = 0; i < sampleLength; i++)
+			audioDataS32[i] = SWAP32(audioDataS32[i]);
+		#endif
 
 		// convert from stereo to mono (if needed)
 		if (numChannels == 2)
@@ -430,6 +457,10 @@ bool loadWAVSample(FILE *f, uint32_t filesize, moduleSample_t *s)
 			displayErrorMsg("I/O ERROR !");
 			return false;
 		}
+		#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+		for (int i = 0; i < sampleLength; i++)
+			audioDataS32[i] = SWAP32(audioDataS32[i]);
+		#endif
 
 		float *fAudioDataFloat = (float *)audioDataU32;
 
@@ -486,6 +517,11 @@ bool loadWAVSample(FILE *f, uint32_t filesize, moduleSample_t *s)
 			displayErrorMsg("I/O ERROR !");
 			return false;
 		}
+		#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+		for (int i = 0; i < sampleLength; i++)
+			audioDataU32[i] = SWAP64(audioDataU32[i]);
+		#endif
+
 
 		double *dAudioDataDouble = (double *)audioDataU32;
 
@@ -547,6 +583,13 @@ bool loadWAVSample(FILE *f, uint32_t filesize, moduleSample_t *s)
 		fseek(f, 12, SEEK_CUR);
 		fread(&loopStart, 4, 1, f);
 		fread(&loopEnd, 4, 1, f);
+
+		#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+		loopFlags = SWAP32(loopFlags);
+		loopStart = SWAP32(loopStart);
+		loopEnd = SWAP32(loopEnd);
+		#endif
+
 		loopEnd++;
 
 		if (loopFlags) // loop enabled?
@@ -585,6 +628,9 @@ bool loadWAVSample(FILE *f, uint32_t filesize, moduleSample_t *s)
 		// volume (0..256)
 		fseek(f, 2, SEEK_CUR);
 		fread(&tempVol, 2, 1, f);
+		#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+		tempVol = SWAP16(tempVol);
+		#endif
 		if (tempVol > 256)
 			tempVol = 256;
 

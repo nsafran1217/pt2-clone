@@ -311,6 +311,12 @@ static int32_t SDLCALL mod2WavThreadFunc(void *ptr)
 				samplesTodo = samplesLeft;
 
 			fread(fadeOutBuffer, sizeof (int16_t), samplesTodo * 2, f);
+			#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+			for (int i = 0; i < samplesTodo * 2; i++)
+			{
+			    fadeOutBuffer[i] = SWAP16(fadeOutBuffer[i]);
+			}
+			#endif
 			fseek(f, 0 - (samplesTodo * sizeof (int16_t) * 2), SEEK_CUR);
 
 			// apply fadeout
