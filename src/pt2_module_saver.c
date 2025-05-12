@@ -28,8 +28,12 @@ bool modSave(char *fileName)
 		moduleSample_t *s = &song->samples[i];
 
 		fwrite(s->text, 1, 22, f);
-
+		#if SDL_BYTEORDER == SDL_LIL_ENDIAN
 		uint16_t length = SWAP16(s->length >> 1);
+		#endif
+		#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+		uint16_t length = s->length >> 1;
+		#endif
 		fwrite(&length, sizeof (int16_t), 1, f);
 
 		fputc(s->fineTune & 0xF, f);
@@ -46,10 +50,14 @@ bool modSave(char *fileName)
 			loopStart = 0;
 			loopLength = 2;
 		}
-
+		#if SDL_BYTEORDER == SDL_LIL_ENDIAN
 		uint16_t loopStart16 = SWAP16(loopStart >> 1);
 		uint16_t loopLength16 = SWAP16(loopLength >> 1);
-
+		#endif
+		#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+		uint16_t loopStart16 = loopStart >> 1;
+		uint16_t loopLength16 = loopLength >> 1;
+		#endif
 		fwrite(&loopStart16, sizeof (int16_t), 1, f);
 		fwrite(&loopLength16, sizeof (int16_t), 1, f);
 	}

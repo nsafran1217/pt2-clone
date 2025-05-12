@@ -49,7 +49,9 @@ static void iffWriteUint32(FILE *f, uint32_t value)
 
 static void iffWriteUint16(FILE *f, uint16_t value)
 {
+	#if SDL_BYTEORDER == SDL_LIL_ENDIAN
 	value = SWAP16(value);
+	#endif
 	fwrite(&value, sizeof (int16_t), 1, f);
 }
 

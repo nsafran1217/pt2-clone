@@ -41,8 +41,10 @@ bool loadIFFSample(FILE *f, uint32_t filesize, moduleSample_t *s)
 		fread(&blockName, 4, 1, f); if (feof(f)) break;
 		fread(&blockSize, 4, 1, f); if (feof(f)) break;
 
+		#if SDL_BYTEORDER == SDL_LIL_ENDIAN
 		blockName = SWAP32(blockName);
 		blockSize = SWAP32(blockSize);
+		#endif
 
 		switch (blockName)
 		{
@@ -87,10 +89,19 @@ bool loadIFFSample(FILE *f, uint32_t filesize, moduleSample_t *s)
 		bodyLen = filesize - bodyPtr;
 
 	fseek(f, vhdrPtr, SEEK_SET);
-	fread(&loopStart,  4, 1, f); loopStart  = SWAP32(loopStart);
-	fread(&loopLength, 4, 1, f); loopLength = SWAP32(loopLength);
+	fread(&loopStart,  4, 1, f); 
+	#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+	loopStart  = SWAP32(loopStart);
+	#endif
+	fread(&loopLength, 4, 1, f); 
+	#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+	loopLength = SWAP32(loopLength);
+	#endif
 	fseek(f, 4, SEEK_CUR);
-	fread(&sampleRate, 2, 1, f); sampleRate = SWAP16(sampleRate);
+	fread(&sampleRate, 2, 1, f); 
+	#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+	sampleRate = SWAP16(sampleRate);
+	#endif
 	fseek(f, 1, SEEK_CUR);
 
 	if (fgetc(f) != 0) // sample type
@@ -99,7 +110,10 @@ bool loadIFFSample(FILE *f, uint32_t filesize, moduleSample_t *s)
 		return false;
 	}
 
-	fread(&sampleVolume, 4, 1, f); sampleVolume = SWAP32(sampleVolume);
+	fread(&sampleVolume, 4, 1, f); 
+	#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+	sampleVolume = SWAP32(sampleVolume);
+	#endif
 	if (sampleVolume > 65536)
 		sampleVolume = 65536;
 

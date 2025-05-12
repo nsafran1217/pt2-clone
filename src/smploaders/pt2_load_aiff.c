@@ -25,8 +25,12 @@ static uint32_t getAIFFSampleRate(uint8_t *in)
 
 	const uint16_t exp15 = ((in[0] & 0x7F) << 8) | in[1];
 	const uint64_t mantissaBits = *(uint64_t *)&in[2];
+	#if SDL_BYTEORDER == SDL_LIL_ENDIAN
 	const uint64_t mantissa63 = SWAP64(mantissaBits) & INT64_MAX;
-
+	#endif
+	#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	const uint64_t mantissa63 = mantissaBits & INT64_MAX;
+	#endif
 	double dExp = exp15 - EXP_BIAS;
 	double dMantissa = mantissa63 / ((double)INT64_MAX+1.0);
 
@@ -54,8 +58,10 @@ bool loadAIFFSample(FILE *f, uint32_t filesize, moduleSample_t *s)
 		fread(&blockName, 4, 1, f); if (feof(f)) break;
 		fread(&blockSize, 4, 1, f); if (feof(f)) break;
 
+		#if SDL_BYTEORDER == SDL_LIL_ENDIAN
 		blockName = SWAP32(blockName);
 		blockSize = SWAP32(blockSize);
+		#endif
 
 		switch (blockName)
 		{
@@ -93,9 +99,15 @@ bool loadAIFFSample(FILE *f, uint32_t filesize, moduleSample_t *s)
 		ssndLen = filesize - ssndPtr;
 
 	fseek(f, commPtr, SEEK_SET);
-	fread(&numChannels, 2, 1, f); numChannels = SWAP16(numChannels);
+	fread(&numChannels, 2, 1, f); 
+	#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+	numChannels = SWAP16(numChannels);
+	#endif
 	fseek(f, 4, SEEK_CUR);
-	fread(&bitDepth, 2, 1, f); bitDepth = SWAP16(bitDepth);
+	fread(&bitDepth, 2, 1, f); 
+	#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+	bitDepth = SWAP16(bitDepth);
+	#endif
 	fread(sampleRateBytes, 1, 10, f);
 
 	fseek(f, 4 + 2 + 1, SEEK_CUR);
@@ -227,11 +239,11 @@ bool loadAIFFSample(FILE *f, uint32_t filesize, moduleSample_t *s)
 			displayErrorMsg("I/O ERROR !");
 			return false;
 		}
-
+		#if SDL_BYTEORDER == SDL_LIL_ENDIAN
 		// fix endianness
 		for (int32_t i = 0; i < sampleLength; i++)
 			audioDataS16[i] = SWAP16(audioDataS16[i]);
-
+		#endif
 		// convert from stereo to mono (if needed)
 		if (numChannels == 2)
 		{
@@ -365,9 +377,10 @@ bool loadAIFFSample(FILE *f, uint32_t filesize, moduleSample_t *s)
 		}
 
 		// fix endianness
+		#if SDL_BYTEORDER == SDL_LIL_ENDIAN
 		for (int32_t i = 0; i < sampleLength; i++)
 			audioDataS32[i] = SWAP32(audioDataS32[i]);
-
+		#endif
 		// convert from stereo to mono (if needed)
 		if (numChannels == 2)
 		{

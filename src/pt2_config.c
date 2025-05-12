@@ -561,7 +561,9 @@ static bool loadPTDotConfig(FILE *f)
 	for (int32_t i = 0; i < 8; i++)
 	{
 		fread(&tmp16, 2, 1, f); // stored as Big-Endian
+		#if SDL_BYTEORDER == SDL_LIL_ENDIAN
 		tmp16 = SWAP16(tmp16);
+		#endif
 		video.palette[i] = RGB12_to_RGB24(tmp16);
 	}
 
@@ -589,7 +591,9 @@ static bool loadPTDotConfig(FILE *f)
 	for (int32_t i = 0; i < 10; i++)
 	{
 		fread(&tmp16, 2, 1, f); // stored as Big-Endian
+		#if SDL_BYTEORDER == SDL_LIL_ENDIAN
 		tmp16 = SWAP16(tmp16);
+		#endif
 		editor.effectMacros[i] = tmp16;
 	}
 
@@ -647,7 +651,9 @@ static bool loadPTDotConfig(FILE *f)
 	for (int32_t i = 0; i < 48; i++)
 	{
 		fread(&vuMeterColors[i], 2, 1, f); // stored as Big-Endian
+		#if SDL_BYTEORDER == SDL_LIL_ENDIAN
 		vuMeterColors[i] = SWAP16(vuMeterColors[i]);
+		#endif
 	}
 
 	// Spectrum Analyzer Colors
@@ -655,7 +661,9 @@ static bool loadPTDotConfig(FILE *f)
 	for (int32_t i = 0; i < 36; i++)
 	{
 		fread(&analyzerColors[i], 2, 1, f); // stored as Big-Endian
+		#if SDL_BYTEORDER == SDL_LIL_ENDIAN
 		analyzerColors[i] = SWAP16(analyzerColors[i]);
+		#endif
 	}
 
 	fclose(f);
