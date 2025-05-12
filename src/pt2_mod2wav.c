@@ -21,6 +21,7 @@
 #include "pt2_config.h"
 #include "pt2_askbox.h"
 #include "pt2_replayer.h"
+#include "pt2_helpers.h"
 
 #define FADEOUT_CHUNK_SAMPLES 16384
 #define TICKS_PER_RENDER_CHUNK 64

@@ -459,7 +459,7 @@ bool loadWAVSample(FILE *f, uint32_t filesize, moduleSample_t *s)
 		}
 		#if SDL_BYTEORDER == SDL_BIG_ENDIAN
 		for (int i = 0; i < sampleLength; i++)
-			audioDataS32[i] = SWAP32(audioDataS32[i]);
+			audioDataU32[i] = SWAP32(audioDataU32[i]);
 		#endif
 
 		float *fAudioDataFloat = (float *)audioDataU32;

@@ -18,7 +18,6 @@
 #include "pt2_askbox.h"
 #include "pt2_replayer.h"
 
-#include "endian_utils.h"
 
 
 enum
