@@ -298,7 +298,7 @@ static void startInputAudio(void)
 
 	memset(&want, 0, sizeof (SDL_AudioSpec));
 	want.freq = config.audioInputFrequency;
-	want.format = AUDIO_S16;
+	want.format = AUDIO_S16MSB;
 	want.channels = 2;
 	want.callback = samplingCallback;
 	want.userdata = NULL;
